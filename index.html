@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>我的个人主页</title>
+  <meta name="description" content="个人简介、项目与联系方式" />
+  <style>
+    :root{
+      --bg:#0b0c10; /* 深色背景 */
+      --card:#12141a;
+      --fg:#e8ecf1; /* 文字颜色 */
+      --muted:#a9b1bb;
+      --accent:#4cc9f0; /* 主色 */
+      --accent-2:#a78bfa;
+      --max:1080px;
+      --radius:18px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:var(--max);padding:24px;margin:0 auto}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin:8px 0 24px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow)}
+    nav a{margin-left:16px;color:var(--muted)}
+    nav a.active, nav a:hover{color:var(--fg)}
+
+    .hero{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
+    @media (max-width:860px){.hero{grid-template-columns:1fr}}
+    .card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+    h1{font-size:clamp(28px,4.5vw,44px);margin:8px 0 12px}
+    .muted{color:var(--muted)}
+    .btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+    .btn{display:inline-block;padding:10px 16px;border-radius:12px;background:var(--accent);color:#081018;font-weight:600}
+    .btn.secondary{background:#1f2330;color:var(--fg);border:1px solid #2a3040}
+
+    section{margin:28px 0}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    @media (max-width:860px){.grid{grid-template-columns:1fr}}
+    .item{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .item h3{margin:6px 0 8px}
+    .tag{display:inline-block;padding:4px 8px;border:1px solid #2a3040;border-radius:999px;color:var(--muted);font-size:12px}
+
+    footer{margin:36px 0 8px;color:var(--muted);text-align:center;font-size:14px}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media (max-width:860px){.split{grid-template-columns:1fr}}
+    input,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2a3040;background:#0f1218;color:var(--fg)}
+    textarea{min-height:120px;resize:vertical}
+    .mailto{word-break:break-all}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <strong>你的名字</strong><div class="muted">Front‑end / 数据分析 / 生活记录</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#about" class="active">关于</a>
+        <a href="#projects">项目</a>
+        <a href="#contact">联系</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="card">
+        <h1>你好，我是 <span style="color:var(--accent)">你的名字</span> 👋</h1>
+        <p class="muted">一句话介绍你：例如“热爱把复杂问题拆解成优雅的产品与代码”。这里可以写你所在城市与擅长的方向。</p>
+        <div class="btns">
+          <a class="btn" href="#projects">查看项目</a>
+          <a class="btn secondary" href="#contact">约个时间聊聊</a>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="margin:6px 0 8px">当前在做</h2>
+        <ul class="muted" style="margin:0 0 8px 18px">
+          <li>✳︎ 学习 Python / pandas 自动化日常表格处理</li>
+          <li>✳︎ 练习前端：HTML/CSS/JS</li>
+          <li>✳︎ 博客写作：每周一篇</li>
+        </ul>
+        <span class="tag">Last update: <script>document.write(new Date().toISOString().slice(0,10))</script></span>
+      </div>
+    </section>
+
+    <section id="about">
+      <h2>关于我</h2>
+      <div class="card">
+        <p>这里是更详细的自我介绍。你可以写职业经历、擅长技能、喜欢的技术栈、以及你正在寻找的机会。</p>
+        <p class="muted">小提示：把这段文字精简为 3–5 句最有记忆点的话。</p>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2>项目</h2>
+      <div class="grid">
+        <article class="item">
+          <span class="tag">Python</span>
+          <h3>Excel 自动化工具</h3>
+          <p class="muted">用 pandas / openpyxl 批量清洗与汇总指标，一键导出日报。</p>
+          <a href="#" aria-label="项目链接">查看代码 →</a>
+        </article>
+        <article class="item">
+          <span class="tag">Web</span>
+          <h3>个人博客</h3>
+          <p class="muted">记录工作流、读书与生活感悟，支持全文检索与暗色模式。</p>
+          <a href="#">访问网站 →</a>
+        </article>
+        <article class="item">
+          <span class="tag">Data</span>
+          <h3>可视化面板</h3>
+          <p class="muted">用 ECharts / Plotly 做的业务看板，自动拉取最新数据。</p>
+          <a href="#">在线预览 →</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>联系我</h2>
+      <div class="split">
+        <div class="card">
+          <p class="muted">最快方式：给我发邮件。</p>
+          <p class="mailto"><a href="mailto:you@example.com" class="btn">you@example.com</a></p>
+          <p class="muted">也可以把这段换成第三方表单服务的地址（如 Formspree / Getform）。</p>
+        </div>
+        <div class="card">
+          <form onsubmit="event.preventDefault();alert('前端静态页无法直接收表单，建议改用 mailto 或第三方表单服务。');">
+            <label>你的称呼</label>
+            <input placeholder="张三" required />
+            <label style="margin-top:8px;display:block">你的邮箱</label>
+            <input type="email" placeholder="name@example.com" required />
+            <label style="margin-top:8px;display:block">想聊什么</label>
+            <textarea placeholder="简单说说你的需求……"></textarea>
+            <div class="btns" style="margin-top:10px"><button class="btn" type="submit">发送</button></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="y"></span> 你的名字 · 建站于 GitHub Pages / Vercel · <a href="#">返回顶部</a>
+    </footer>
+  </div>
+  <script>document.getElementById('y').textContent=new Date().getFullYear()</script>
+</body>
+</html>
