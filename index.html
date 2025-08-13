@@ -50,6 +50,18 @@
     input,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2a3040;background:#0f1218;color:var(--fg)}
     textarea{min-height:120px;resize:vertical}
     .mailto{word-break:break-all}
+
+    /* 相册样式 */
+    #gallery .grid{grid-template-columns:repeat(4,1fr)}
+    @media (max-width:1024px){#gallery .grid{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width:720px){#gallery .grid{grid-template-columns:repeat(2,1fr)}}
+    .photo-tile{position:relative;overflow:hidden;border-radius:var(--radius)}
+    .photo-tile img{width:100%;height:220px;object-fit:cover;display:block}
+    .photo-tile .cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent, rgba(0,0,0,.6));padding:8px 10px;font-size:12px}
+    .admin-only{display:none}
+    .admin-on .admin-only{display:block}
+    .hint{font-size:12px;color:var(--muted)}
+    .danger{color:#ff6b6b}
   </style>
 </head>
 <body>
@@ -64,6 +76,7 @@
       <nav>
         <a href="#about" class="active">关于</a>
         <a href="#projects">项目</a>
+        <a href="#gallery">相册</a>
         <a href="#contact">联系</a>
       </nav>
     </header>
@@ -75,6 +88,7 @@
         <div class="btns">
           <a class="btn" href="#projects">查看项目</a>
           <a class="btn secondary" href="#contact">约个时间聊聊</a>
+          <button id="adminToggle" class="btn secondary" type="button" title="仅本人使用">进入上传</button>
         </div>
       </div>
       <div class="card">
@@ -95,7 +109,8 @@
         <p class="muted">小提示：把这段文字精简为 3–5 句最有记忆点的话。</p>
       </div>
     </section>
-          
+
+    <section id="projects">
       <h2>项目</h2>
       <div class="grid">
         <article class="item">
@@ -119,13 +134,55 @@
       </div>
     </section>
 
+    <!-- 相册 + 上传 -->
+    <section id="gallery">
+      <h2>相册</h2>
+
+      <!-- 上传区（仅本人使用：前端口令 + Cloudinary 无签名上传） -->
+      <div class="card admin-only" id="uploader">
+        <h3 style="margin:0 0 8px">上传照片（仅本人）</h3>
+        <p class="hint">说明：GitHub Pages 是静态托管，无法直接保存上传文件。这里采用 <a href="https://cloudinary.com/" target="_blank">Cloudinary</a> 的<strong>无签名上传</strong>。
+          你需要在 Cloudinary 后台创建 <code>上传预设</code>（unsigned），并限制到指定文件夹与文件类型。下面填上你的 <code>cloudName</code> 与 <code>uploadPreset</code> 后即可使用。
+        </p>
+        <div class="split">
+          <div>
+            <label>Cloudinary cloudName</label>
+            <input id="cloudName" placeholder="例：demo" />
+            <label style="margin-top:8px;display:block">uploadPreset（无签名）</label>
+            <input id="uploadPreset" placeholder="例：gallery_unsigned" />
+            <label style="margin-top:8px;display:block">可选：目标文件夹</label>
+            <input id="folder" placeholder="例：site-gallery" />
+          </div>
+          <div>
+            <label>选择图片</label>
+            <input id="fileInput" type="file" accept="image/*" multiple />
+            <label style="margin-top:8px;display:block">可选：统一标签（便于后台管理）</label>
+            <input id="tags" placeholder="例：site-gallery" />
+            <div class="btns" style="margin-top:10px">
+              <button class="btn" id="uploadBtn" type="button">开始上传</button>
+              <button class="btn secondary" id="clearLocal" type="button" title="只清除本机记录，不会删除 Cloudinary 上的图片">清除本机记录</button>
+            </div>
+            <p class="hint">上传后会即时出现在下方网格中；图片实际存储在 Cloudinary，页面下次打开会从本机浏览器记录中恢复缩略图（可选：你也可以改造成读取你维护的 <code>photos.json</code>）。</p>
+          </div>
+        </div>
+        <div id="prog" class="hint"></div>
+      </div>
+
+      <div class="grid" id="galleryGrid"></div>
+
+      <!-- 轻量灯箱 -->
+      <div id="lightbox" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:9999">
+        <img id="lightbox-img" src="" alt="" style="max-width:90vw;max-height:90vh;border-radius:12px">
+      </div>
+    </section>
+
     <section id="contact">
       <h2>联系我</h2>
       <div class="split">
         <div class="card">
           <p class="muted">最快方式：给我发邮件。</p>
-          <p class="mailto"><a href="mailto:you@example.com" class="btn">zhouyao677@gmail.com</a></p>
-          <p class="muted">第三方表单服务的地址（如 Formspree / Getform）。</p>
+          <p class="mailto"><a href="mailto:zhouyao677@gmail.com" class="btn">zhouyao677@gmail.com</a></p>
+          <p class="muted">也可接入第三方表单（Formspree / Getform）。</p>
         </div>
         <div class="card">
           <form onsubmit="event.preventDefault();alert('前端静态页无法直接收表单，建议改用 mailto 或第三方表单服务。');">
@@ -145,6 +202,112 @@
       © <span id="y"></span> 你的名字 · 建站于 GitHub Pages / Vercel · <a href="#">返回顶部</a>
     </footer>
   </div>
-  <script>document.getElementById('y').textContent=new Date().getFullYear()</script>
+
+  <script>
+    document.getElementById('y').textContent=new Date().getFullYear()
+
+    // —— 简单“本人模式”开关（前端口令，仅防君子，不具备安全性） ——
+    const root = document.documentElement;
+    const adminToggle = document.getElementById('adminToggle');
+    adminToggle.addEventListener('click', () => {
+      const ok = prompt('输入上传口令（自行约定，例如：zy-only）：');
+      if(!ok) return;
+      // 你可以把口令换成任意字符串；这里仅做前端挡板
+      if(ok === 'zy-only'){
+        document.body.classList.add('admin-on');
+        alert('已进入上传模式');
+        // 记忆一次会话
+        sessionStorage.setItem('admin-on','1');
+      }else{
+        alert('口令错误');
+      }
+    });
+    if(sessionStorage.getItem('admin-on')==='1'){
+      document.body.classList.add('admin-on');
+    }
+
+    // —— 轻量灯箱 ——
+    const box = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    box.addEventListener('click', ()=>{ box.style.display='none'; img.src=''; });
+
+    // —— 渲染一个图片卡片 ——
+    function addPhotoCard(url, cap){
+      const grid = document.getElementById('galleryGrid');
+      const a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.className = 'photo-tile';
+      a.innerHTML = `<img src="${url}" alt="${cap||'photo'}" loading="lazy"><div class="cap">${cap||''}</div>`;
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        img.src = url; box.style.display = 'flex';
+      });
+      grid.prepend(a);
+    }
+
+    // —— 从本机记录恢复缩略图（可选） ——
+    const local = JSON.parse(localStorage.getItem('zy_photos')||'[]');
+    local.forEach(p=>addPhotoCard(p.url, p.cap));
+    document.getElementById('clearLocal').addEventListener('click', ()=>{
+      if(confirm('仅清除本机浏览器记录，Cloudinary 上的图片不会删除。继续？')){
+        localStorage.removeItem('zy_photos'); location.reload();
+      }
+    });
+
+    // —— Cloudinary 无签名上传 ——
+    async function uploadToCloudinary(file, cfg){
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', cfg.uploadPreset);
+      if(cfg.folder) fd.append('folder', cfg.folder);
+      if(cfg.tags) fd.append('tags', cfg.tags);
+      // 可选：给图片加 caption（在后台可见）
+      // fd.append('context', 'caption=' + encodeURIComponent(cfg.caption||''));
+
+      const endpoint = `https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`;
+      const res = await fetch(endpoint, { method:'POST', body: fd });
+      if(!res.ok){
+        const t = await res.text();
+        throw new Error('上传失败：'+t);
+      }
+      return res.json();
+    }
+
+    document.getElementById('uploadBtn').addEventListener('click', async()=>{
+      const cloudName = document.getElementById('cloudName').value.trim();
+      const uploadPreset = document.getElementById('uploadPreset').value.trim();
+      const folder = document.getElementById('folder').value.trim();
+      const tags = document.getElementById('tags').value.trim();
+      const files = document.getElementById('fileInput').files;
+      const prog = document.getElementById('prog');
+
+      if(!cloudName || !uploadPreset){
+        alert('请先填写 cloudName 与 uploadPreset');
+        return;
+      }
+      if(!files || !files.length){
+        alert('请选择至少一张图片');
+        return;
+      }
+
+      let okCnt = 0;
+      for(const f of files){
+        prog.textContent = `正在上传：${f.name} (${Math.round(f.size/1024)}KB)`;
+        try{
+          const res = await uploadToCloudinary(f, {cloudName, uploadPreset, folder, tags});
+          // 使用 Cloudinary 自动生成的 secure_url
+          addPhotoCard(res.secure_url, f.name);
+          // 写入本机记录以便刷新后仍可见
+          const list = JSON.parse(localStorage.getItem('zy_photos')||'[]');
+          list.push({url: res.secure_url, cap: f.name, t: Date.now()});
+          localStorage.setItem('zy_photos', JSON.stringify(list));
+          okCnt++;
+        }catch(err){
+          console.error(err);
+          alert(err.message);
+        }
+      }
+      prog.textContent = `完成：成功 ${okCnt}/${files.length}`;
+    });
+  </script>
 </body>
 </html>
