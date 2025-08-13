@@ -147,9 +147,9 @@
         <div class="split">
           <div>
             <label>Cloudinary cloudName</label>
-            <input id="cloudName" placeholder="例：demo" />
+            <input id="cloudName" value="dxryl0cju" placeholder="例：demo" />
             <label style="margin-top:8px;display:block">uploadPreset（无签名）</label>
-            <input id="uploadPreset" placeholder="例：gallery_unsigned" />
+            <input id="uploadPreset" value="ghuakzji" placeholder="例：gallery_unsigned" />
             <label style="margin-top:8px;display:block">可选：目标文件夹</label>
             <input id="folder" placeholder="例：site-gallery" />
           </div>
@@ -271,6 +271,8 @@
       }
       return res.json();
     }
+    document.getElementById('cloudName').value = "dxryl0cju";
+document.getElementById('uploadPreset').value = "ghuakzji";
 
     document.getElementById('uploadBtn').addEventListener('click', async()=>{
       const cloudName = document.getElementById('cloudName').value.trim();
