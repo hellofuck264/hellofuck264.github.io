@@ -141,13 +141,11 @@
       <!-- 上传区（仅本人使用：前端口令 + Cloudinary 无签名上传） -->
       <div class="card admin-only" id="uploader">
         <h3 style="margin:0 0 8px">上传照片（仅本人）</h3>
-        <p class="hint">说明：GitHub Pages 是静态托管，无法直接保存上传文件。这里采用 <a href="https://cloudinary.com/" target="_blank">Cloudinary</a> 的<strong>无签名上传</strong>。
-          你需要在 Cloudinary 后台创建 <code>上传预设</code>（unsigned），并限制到指定文件夹与文件类型。下面填上你的 <code>cloudName</code> 与 <code>uploadPreset</code> 后即可使用。
-        </p>
+        <p class="hint">说明：GitHub Pages 是静态托管，无法直接保存上传文件。这里采用 <a href="https://cloudinary.com/" target="_blank">Cloudinary</a> 的<strong>无签名上传</strong>；所有人可见的相册来自仓库根目录的 <code>photos.json</code> 公共清单。</p>
         <div class="split">
           <div>
             <label>Cloudinary cloudName</label>
-            <input id="cloudName" value="dxyy1ocju" placeholder="例：demo" />
+            <input id="cloudName" value="dxryl0cju" placeholder="例：demo" />
             <label style="margin-top:8px;display:block">uploadPreset（无签名）</label>
             <input id="uploadPreset" value="ghuakzji" placeholder="例：gallery_unsigned" />
             <label style="margin-top:8px;display:block">可选：目标文件夹</label>
@@ -162,7 +160,7 @@
               <button class="btn" id="uploadBtn" type="button">开始上传</button>
               <button class="btn secondary" id="clearLocal" type="button" title="只清除本机记录，不会删除 Cloudinary 上的图片">清除本机记录</button>
             </div>
-            <p class="hint">上传后会即时出现在下方网格中；图片实际存储在 Cloudinary，页面下次打开会从本机浏览器记录中恢复缩略图（可选：你也可以改造成读取你维护的 <code>photos.json</code>）。</p>
+            <p class="hint">上传后会即时出现在下方网格中；并在控制台打印一行可直接粘贴到 <code>photos.json</code> 的 JSON。把它追加进仓库的 <code>photos.json</code> 并 <code>git push</code> 后，任何人刷新页面都能看到。</p>
           </div>
         </div>
         <div id="prog" class="hint"></div>
@@ -207,16 +205,13 @@
     document.getElementById('y').textContent=new Date().getFullYear()
 
     // —— 简单“本人模式”开关（前端口令，仅防君子，不具备安全性） ——
-    const root = document.documentElement;
     const adminToggle = document.getElementById('adminToggle');
     adminToggle.addEventListener('click', () => {
       const ok = prompt('输入上传口令（自行约定，例如：zy-only）：');
       if(!ok) return;
-      // 你可以把口令换成任意字符串；这里仅做前端挡板
       if(ok === 'zy-only'){
         document.body.classList.add('admin-on');
         alert('已进入上传模式');
-        // 记忆一次会话
         sessionStorage.setItem('admin-on','1');
       }else{
         alert('口令错误');
@@ -244,7 +239,7 @@
       grid.prepend(a);
     }
 
-    // —— 从本机记录恢复缩略图（可选） ——
+    // —— 从本机记录恢复缩略图（仅便于你本人预览） ——
     const local = JSON.parse(localStorage.getItem('zy_photos')||'[]');
     local.forEach(p=>addPhotoCard(p.url, p.cap));
     document.getElementById('clearLocal').addEventListener('click', ()=>{
@@ -253,6 +248,17 @@
       }
     });
 
+    // —— 共享清单：从仓库 photos.json 读取，所有访客都会看到 ——
+    async function loadSharedGallery(){
+      try{
+        const res = await fetch('photos.json?ts=' + Date.now(), {cache:'no-store'});
+        if(!res.ok) return;
+        const list = await res.json();
+        list.forEach(p=> addPhotoCard(p.url || p, p.cap || ''));
+      }catch(e){ console.warn('加载共享相册失败', e); }
+    }
+    loadSharedGallery();
+
     // —— Cloudinary 无签名上传 ——
     async function uploadToCloudinary(file, cfg){
       const fd = new FormData();
@@ -260,9 +266,6 @@
       fd.append('upload_preset', cfg.uploadPreset);
       if(cfg.folder) fd.append('folder', cfg.folder);
       if(cfg.tags) fd.append('tags', cfg.tags);
-      // 可选：给图片加 caption（在后台可见）
-      // fd.append('context', 'caption=' + encodeURIComponent(cfg.caption||''));
-
       const endpoint = `https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`;
       const res = await fetch(endpoint, { method:'POST', body: fd });
       if(!res.ok){
@@ -271,8 +274,6 @@
       }
       return res.json();
     }
-    document.getElementById('cloudName').value = "dxyy1ocju";
-document.getElementById('uploadPreset').value = "ghuakzji";
 
     document.getElementById('uploadBtn').addEventListener('click', async()=>{
       const cloudName = document.getElementById('cloudName').value.trim();
@@ -296,19 +297,18 @@ document.getElementById('uploadPreset').value = "ghuakzji";
         prog.textContent = `正在上传：${f.name} (${Math.round(f.size/1024)}KB)`;
         try{
           const res = await uploadToCloudinary(f, {cloudName, uploadPreset, folder, tags});
-          // 使用 Cloudinary 自动生成的 secure_url
           addPhotoCard(res.secure_url, f.name);
-          // 写入本机记录以便刷新后仍可见
+          // 记到本机，便于你本人立刻回看
           const list = JSON.parse(localStorage.getItem('zy_photos')||'[]');
           list.push({url: res.secure_url, cap: f.name, t: Date.now()});
           localStorage.setItem('zy_photos', JSON.stringify(list));
+          // 打印一行可直接复制到 photos.json 的 JSON
+          console.log('ADD_TO_photos.json', JSON.stringify({url: res.secure_url, cap: f.name}));
           okCnt++;
-        }catch(err){
-          console.error(err);
-          alert(err.message);
-        }
+        }catch(err){ console.error(err); alert(err.message); }
       }
-      prog.textContent = `完成：成功 ${okCnt}/${files.length}`;
+      prog.textContent = `完成：成功 ${okCnt}/${files.length}。
+提示：打开浏览器控制台，复制所有 “ADD_TO_photos.json ...” 行，粘贴到仓库根目录 photos.json 数组里并提交。`;
     });
   </script>
 </body>
