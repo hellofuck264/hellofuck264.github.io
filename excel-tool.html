@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Excel 自动化工具 · 周杳</title>
+  <meta name="description" content="用 Python / pandas / openpyxl 批量清洗与汇总指标，一键导出日报。" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%234cc9f0'/><stop offset='100%25' stop-color='%23a78bfa'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23g)'/></svg>" />
+  <style>
+    :root {
+      --bg: #060810;
+      --fg: #e8ecf1;
+      --muted: #8892a4;
+      --accent: #4cc9f0;
+      --accent-2: #a78bfa;
+      --accent-3: #f472b6;
+      --max: 1080px;
+      --radius: 20px;
+      --glass-bg: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.08);
+      --glass-hover-border: rgba(76,201,240,0.28);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 背景光晕 */
+    .orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+    .orb-1 { width: 600px; height: 600px; background: var(--accent);   opacity: .09; top: -150px; right: -150px; }
+    .orb-2 { width: 450px; height: 450px; background: var(--accent-2); opacity: .09; bottom: -80px; left: -120px; }
+
+    /* 导航 */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(6,8,16,0.75);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .brand { display: flex; gap: 12px; align-items: center; text-decoration: none; color: var(--fg); }
+    .logo { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,var(--accent),var(--accent-2)); box-shadow: 0 0 16px rgba(76,201,240,.35); flex-shrink:0; }
+    .brand span { font-size: 15px; font-weight: 600; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 999px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      color: var(--muted); font-size: 13px; font-weight: 500;
+      text-decoration: none; transition: color .2s, border-color .2s;
+    }
+    .back-btn:hover { color: var(--fg); border-color: var(--glass-hover-border); }
+
+    /* 主体 */
+    .wrap { position: relative; z-index: 1; max-width: var(--max); margin: 0 auto; padding: 56px 24px 48px; }
+
+    /* Hero 区 */
+    .project-hero { margin-bottom: 56px; }
+    .tags-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .chip {
+      display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: .4px;
+      background: rgba(76,201,240,.1); color: var(--accent); border: 1px solid rgba(76,201,240,.2);
+    }
+    .chip.purple { background: rgba(167,139,250,.1); color: var(--accent-2); border-color: rgba(167,139,250,.2); }
+    .chip.pink   { background: rgba(244,114,182,.1); color: var(--accent-3); border-color: rgba(244,114,182,.2); }
+
+    h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin-bottom: 18px; }
+    .grad { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .lead { font-size: 18px; color: var(--muted); max-width: 620px; line-height: 1.7; margin-bottom: 28px; }
+
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 11px 24px; border-radius: 999px; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; text-decoration: none;
+      transition: transform .2s, box-shadow .2s, opacity .2s;
+    }
+    .btn:hover { transform: translateY(-2px); text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #060810; box-shadow: 0 8px 24px rgba(76,201,240,.3); }
+    .btn-primary:hover { box-shadow: 0 12px 32px rgba(76,201,240,.45); }
+    .btn-ghost { background: var(--glass-bg); color: var(--fg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+    .btn-ghost:hover { border-color: var(--glass-hover-border); }
+
+    /* 截图区 */
+    .screenshots { margin-bottom: 56px; }
+    .section-label { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+    .shot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .shot-grid { grid-template-columns: 1fr; } }
+
+    /* 截图占位 —— 替换时把 .placeholder 换成 <img> 即可 */
+    .shot-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+      background: var(--glass-bg);
+      transition: transform .3s, border-color .3s;
+    }
+    .shot-card:hover { transform: translateY(-4px); border-color: var(--glass-hover-border); }
+    .shot-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .placeholder {
+      height: 240px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+      color: var(--muted); font-size: 13px;
+    }
+    .placeholder svg { opacity: .3; }
+    .shot-label { padding: 12px 16px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--glass-border); }
+
+    /* 功能卡片 */
+    .features { margin-bottom: 56px; }
+    .feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    @media (max-width: 720px) { .feat-grid { grid-template-columns: 1fr; } }
+    .feat-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 24px;
+      transition: transform .3s, box-shadow .3s, border-color .3s;
+    }
+    .feat-card:hover { transform: translateY(-4px); border-color: var(--glass-hover-border); box-shadow: 0 20px 48px rgba(76,201,240,.08); }
+    .feat-icon { font-size: 28px; margin-bottom: 14px; }
+    .feat-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feat-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* 技术栈 */
+    .techstack { margin-bottom: 56px; }
+    .tech-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tech-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 12px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      font-size: 13px; font-weight: 500;
+      transition: border-color .2s;
+    }
+    .tech-item:hover { border-color: var(--glass-hover-border); }
+    .tech-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Footer */
+    footer {
+      margin-top: 60px; padding-top: 24px;
+      border-top: 1px solid var(--glass-border);
+      text-align: center; color: var(--muted); font-size: 13px;
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--fg); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <header>
+    <a class="brand" href="index.html">
+      <div class="logo"></div>
+      <span>周杳的网站</span>
+    </a>
+    <a class="back-btn" href="index.html">← 返回主页</a>
+  </header>
+
+  <div class="wrap">
+
+    <!-- Hero -->
+    <div class="project-hero">
+      <div class="tags-row">
+        <span class="chip">Python</span>
+        <span class="chip purple">pandas</span>
+        <span class="chip purple">openpyxl</span>
+        <span class="chip pink">自动化</span>
+      </div>
+      <h1>Excel <span class="grad">自动化工具</span></h1>
+      <p class="lead">用 Python 批量处理 Excel 数据，告别手动复制粘贴。一键完成数据清洗、指标汇总、日报导出，让重复性工作自动运行。</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#">查看源码 →</a>
+        <a class="btn btn-ghost" href="index.html#projects">← 更多项目</a>
+      </div>
+    </div>
+
+    <!-- 截图 -->
+    <div class="screenshots">
+      <div class="section-label">演示截图</div>
+      <div class="shot-grid">
+        <!-- 替换方法：把 <div class="placeholder">...</div> 换成 <img src="你的截图.png" alt="描述"> -->
+        <div class="shot-card">
+          <div class="placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            <span>截图 1 · 上传后替换此处</span>
+          </div>
+          <div class="shot-label">数据输入界面</div>
+        </div>
+        <div class="shot-card">
+          <div class="placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            <span>截图 2 · 上传后替换此处</span>
+          </div>
+          <div class="shot-label">自动生成的日报</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 功能介绍 -->
+    <div class="features">
+      <div class="section-label">核心功能</div>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-icon">🧹</div>
+          <h3>批量数据清洗</h3>
+          <p>自动处理空值、格式错误、重复行，支持自定义清洗规则，一次配置长期复用。</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📊</div>
+          <h3>指标自动汇总</h3>
+          <p>按日期、部门、品类等维度聚合数据，自动计算环比、同比，生成汇总表。</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📤</div>
+          <h3>一键导出日报</h3>
+          <p>将处理结果写入指定模板，保留格式与样式，直接发送给领导不再手动调整。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 技术栈 -->
+    <div class="techstack">
+      <div class="section-label">技术栈</div>
+      <div class="tech-grid">
+        <div class="tech-item"><div class="tech-dot" style="background:#3776ab"></div>Python 3.x</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#150458"></div>pandas</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#217346"></div>openpyxl</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#f7931a"></div>xlrd / xlwt</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#4cc9f0"></div>argparse CLI</div>
+      </div>
+    </div>
+
+    <footer>
+      © <span id="y"></span> 周杳 &nbsp;·&nbsp; <a href="index.html">← 返回主页</a>
+    </footer>
+  </div>
+
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>
