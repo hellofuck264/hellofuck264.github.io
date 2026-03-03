@@ -7,11 +7,11 @@
   <meta name="description" content="个人简介、项目与联系方式" />
   <style>
     :root{
-      --bg:#0b0c10; /* 深色背景 */
+      --bg:#0b0c10;
       --card:#12141a;
-      --fg:#e8ecf1; /* 文字颜色 */
+      --fg:#e8ecf1;
       --muted:#a9b1bb;
-      --accent:#4cc9f0; /* 主色 */
+      --accent:#4cc9f0;
       --accent-2:#a78bfa;
       --max:1080px;
       --radius:18px;
@@ -61,7 +61,11 @@
     .admin-only{display:none}
     .admin-on .admin-only{display:block}
     .hint{font-size:12px;color:var(--muted)}
-    .danger{color:#ff6b6b}
+
+    /* 联系表单状态 */
+    .form-msg{padding:10px 14px;border-radius:12px;margin-top:10px;display:none}
+    .form-msg.success{background:#0d2e1a;color:#4ade80;display:block}
+    .form-msg.error{background:#2e0d0d;color:#f87171;display:block}
   </style>
 </head>
 <body>
@@ -84,7 +88,7 @@
     <section class="hero">
       <div class="card">
         <h1>你好，我是 <span style="color:var(--accent)">周杳</span> 👋</h1>
-        <p class="muted">“热爱把复杂问题拆解成优雅的产品与代码，同时热爱摄影，希望能与世界的你们交流”。</p>
+        <p class="muted">"热爱把复杂问题拆解成优雅的产品与代码，同时热爱摄影，希望能与世界的你们交流"。</p>
         <div class="btns">
           <a class="btn" href="#projects">查看项目</a>
           <a class="btn secondary" href="#contact">约个时间聊聊</a>
@@ -138,7 +142,6 @@
     <section id="gallery">
       <h2>相册</h2>
 
-      <!-- 上传区（仅本人使用：前端口令 + Cloudinary 无签名上传） -->
       <div class="card admin-only" id="uploader">
         <h3 style="margin:0 0 8px">上传照片（仅本人）</h3>
         <p class="hint">说明：GitHub Pages 是静态托管，无法直接保存上传文件。这里采用 <a href="https://cloudinary.com/" target="_blank">Cloudinary</a> 的<strong>无签名上传</strong>；所有人可见的相册来自仓库根目录的 <code>photos.json</code> 公共清单。</p>
@@ -180,17 +183,21 @@
         <div class="card">
           <p class="muted">最快方式：给我发邮件。</p>
           <p class="mailto"><a href="mailto:zhouyao677@gmail.com" class="btn">zhouyao677@gmail.com</a></p>
-          <p class="muted">也可接入第三方表单（Formspree / Getform）。</p>
+          <p class="muted">也可以直接填右边的表单，我会收到邮件通知。</p>
         </div>
         <div class="card">
-          <form onsubmit="event.preventDefault();alert('前端静态页无法直接收表单，建议改用 mailto 或第三方表单服务。');">
+          <!-- Formspree 表单：将 YOUR_FORM_ID 替换为你在 formspree.io 获得的表单 ID -->
+          <form id="contactForm">
             <label>你的称呼</label>
-            <input placeholder="张三" required />
+            <input name="name" placeholder="张三" required />
             <label style="margin-top:8px;display:block">你的邮箱</label>
-            <input type="email" placeholder="name@example.com" required />
+            <input type="email" name="email" placeholder="name@example.com" required />
             <label style="margin-top:8px;display:block">想聊什么</label>
-            <textarea placeholder="简单说说你的需求……"></textarea>
-            <div class="btns" style="margin-top:10px"><button class="btn" type="submit">发送</button></div>
+            <textarea name="message" placeholder="简单说说你的需求……"></textarea>
+            <div class="btns" style="margin-top:10px">
+              <button class="btn" type="submit" id="submitBtn">发送</button>
+            </div>
+            <div id="formMsg" class="form-msg"></div>
           </form>
         </div>
       </div>
@@ -202,37 +209,87 @@
   </div>
 
   <script>
-    document.getElementById('y').textContent=new Date().getFullYear()
+    document.getElementById('y').textContent = new Date().getFullYear();
 
-    // —— 简单“本人模式”开关（前端口令，仅防君子，不具备安全性） ——
+    // —— 管理员模式：使用 SHA-256 哈希验证，不在代码里存明文密码 ——
+    const ADMIN_HASH = '089f8f6bfe18e5416fa4631913a4280cf032e12bf14a6b7fbc5110dc17223cd1';
+
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
     const adminToggle = document.getElementById('adminToggle');
-    adminToggle.addEventListener('click', () => {
-      const ok = prompt('输入上传口令（自行约定，例如：zy-only）：');
-      if(!ok) return;
-      if(ok === 'zy-only'){
+    adminToggle.addEventListener('click', async () => {
+      const ok = prompt('输入上传口令：');
+      if (!ok) return;
+      const hash = await sha256(ok);
+      if (hash === ADMIN_HASH) {
         document.body.classList.add('admin-on');
         alert('已进入上传模式');
-        sessionStorage.setItem('admin-on','1');
-      }else{
+        sessionStorage.setItem('admin-on', '1');
+      } else {
         alert('口令错误');
       }
     });
-    if(sessionStorage.getItem('admin-on')==='1'){
+    if (sessionStorage.getItem('admin-on') === '1') {
       document.body.classList.add('admin-on');
     }
+
+    // —— 联系表单：通过 Formspree 发送 ——
+    // 使用前：去 https://formspree.io 注册，创建表单后把下面的 YOUR_FORM_ID 换成你的 ID
+    const FORMSPREE_ID = 'YOUR_FORM_ID';
+
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const msg = document.getElementById('formMsg');
+      const form = e.target;
+
+      if (FORMSPREE_ID === 'YOUR_FORM_ID') {
+        msg.className = 'form-msg error';
+        msg.textContent = '⚠️ 请先在代码里填入你的 Formspree 表单 ID（见注释）';
+        return;
+      }
+
+      btn.textContent = '发送中…';
+      btn.disabled = true;
+      msg.className = 'form-msg';
+
+      try {
+        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new FormData(form)
+        });
+        if (res.ok) {
+          msg.className = 'form-msg success';
+          msg.textContent = '✓ 已发送！我会尽快回复你。';
+          form.reset();
+        } else {
+          throw new Error('发送失败');
+        }
+      } catch {
+        msg.className = 'form-msg error';
+        msg.textContent = '发送失败，请直接发邮件到 zhouyao677@gmail.com';
+      } finally {
+        btn.textContent = '发送';
+        btn.disabled = false;
+      }
+    });
 
     // —— 轻量灯箱 ——
     const box = document.getElementById('lightbox');
     const img = document.getElementById('lightbox-img');
-    box.addEventListener('click', ()=>{ box.style.display='none'; img.src=''; });
+    box.addEventListener('click', () => { box.style.display = 'none'; img.src = ''; });
 
     // —— 渲染一个图片卡片 ——
-    function addPhotoCard(url, cap){
+    function addPhotoCard(url, cap) {
       const grid = document.getElementById('galleryGrid');
       const a = document.createElement('a');
       a.href = url; a.target = '_blank'; a.className = 'photo-tile';
-      a.innerHTML = `<img src="${url}" alt="${cap||'photo'}" loading="lazy"><div class="cap">${cap||''}</div>`;
-      a.addEventListener('click', (e)=>{
+      a.innerHTML = `<img src="${url}" alt="${cap || 'photo'}" loading="lazy"><div class="cap">${cap || ''}</div>`;
+      a.addEventListener('click', (e) => {
         e.preventDefault();
         img.src = url; box.style.display = 'flex';
       });
@@ -240,42 +297,42 @@
     }
 
     // —— 从本机记录恢复缩略图（仅便于你本人预览） ——
-    const local = JSON.parse(localStorage.getItem('zy_photos')||'[]');
-    local.forEach(p=>addPhotoCard(p.url, p.cap));
-    document.getElementById('clearLocal').addEventListener('click', ()=>{
-      if(confirm('仅清除本机浏览器记录，Cloudinary 上的图片不会删除。继续？')){
+    const local = JSON.parse(localStorage.getItem('zy_photos') || '[]');
+    local.forEach(p => addPhotoCard(p.url, p.cap));
+    document.getElementById('clearLocal').addEventListener('click', () => {
+      if (confirm('仅清除本机浏览器记录，Cloudinary 上的图片不会删除。继续？')) {
         localStorage.removeItem('zy_photos'); location.reload();
       }
     });
 
     // —— 共享清单：从仓库 photos.json 读取，所有访客都会看到 ——
-    async function loadSharedGallery(){
-      try{
-        const res = await fetch('photos.json?ts=' + Date.now(), {cache:'no-store'});
-        if(!res.ok) return;
+    async function loadSharedGallery() {
+      try {
+        const res = await fetch('photos.json?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) return;
         const list = await res.json();
-        list.forEach(p=> addPhotoCard(p.url || p, p.cap || ''));
-      }catch(e){ console.warn('加载共享相册失败', e); }
+        list.forEach(p => addPhotoCard(p.url || p, p.cap || ''));
+      } catch (e) { console.warn('加载共享相册失败', e); }
     }
     loadSharedGallery();
 
     // —— Cloudinary 无签名上传 ——
-    async function uploadToCloudinary(file, cfg){
+    async function uploadToCloudinary(file, cfg) {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('upload_preset', cfg.uploadPreset);
-      if(cfg.folder) fd.append('folder', cfg.folder);
-      if(cfg.tags) fd.append('tags', cfg.tags);
+      if (cfg.folder) fd.append('folder', cfg.folder);
+      if (cfg.tags) fd.append('tags', cfg.tags);
       const endpoint = `https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`;
-      const res = await fetch(endpoint, { method:'POST', body: fd });
-      if(!res.ok){
+      const res = await fetch(endpoint, { method: 'POST', body: fd });
+      if (!res.ok) {
         const t = await res.text();
-        throw new Error('上传失败：'+t);
+        throw new Error('上传失败：' + t);
       }
       return res.json();
     }
 
-    document.getElementById('uploadBtn').addEventListener('click', async()=>{
+    document.getElementById('uploadBtn').addEventListener('click', async () => {
       const cloudName = document.getElementById('cloudName').value.trim();
       const uploadPreset = document.getElementById('uploadPreset').value.trim();
       const folder = document.getElementById('folder').value.trim();
@@ -283,32 +340,23 @@
       const files = document.getElementById('fileInput').files;
       const prog = document.getElementById('prog');
 
-      if(!cloudName || !uploadPreset){
-        alert('请先填写 cloudName 与 uploadPreset');
-        return;
-      }
-      if(!files || !files.length){
-        alert('请选择至少一张图片');
-        return;
-      }
+      if (!cloudName || !uploadPreset) { alert('请先填写 cloudName 与 uploadPreset'); return; }
+      if (!files || !files.length) { alert('请选择至少一张图片'); return; }
 
       let okCnt = 0;
-      for(const f of files){
-        prog.textContent = `正在上传：${f.name} (${Math.round(f.size/1024)}KB)`;
-        try{
-          const res = await uploadToCloudinary(f, {cloudName, uploadPreset, folder, tags});
+      for (const f of files) {
+        prog.textContent = `正在上传：${f.name} (${Math.round(f.size / 1024)}KB)`;
+        try {
+          const res = await uploadToCloudinary(f, { cloudName, uploadPreset, folder, tags });
           addPhotoCard(res.secure_url, f.name);
-          // 记到本机，便于你本人立刻回看
-          const list = JSON.parse(localStorage.getItem('zy_photos')||'[]');
-          list.push({url: res.secure_url, cap: f.name, t: Date.now()});
+          const list = JSON.parse(localStorage.getItem('zy_photos') || '[]');
+          list.push({ url: res.secure_url, cap: f.name, t: Date.now() });
           localStorage.setItem('zy_photos', JSON.stringify(list));
-          // 打印一行可直接复制到 photos.json 的 JSON
-          console.log('ADD_TO_photos.json', JSON.stringify({url: res.secure_url, cap: f.name}));
+          console.log('ADD_TO_photos.json', JSON.stringify({ url: res.secure_url, cap: f.name }));
           okCnt++;
-        }catch(err){ console.error(err); alert(err.message); }
+        } catch (err) { console.error(err); alert(err.message); }
       }
-      prog.textContent = `完成：成功 ${okCnt}/${files.length}。
-提示：打开浏览器控制台，复制所有 “ADD_TO_photos.json ...” 行，粘贴到仓库根目录 photos.json 数组里并提交。`;
+      prog.textContent = `完成：成功 ${okCnt}/${files.length}。提示：打开浏览器控制台，复制所有 "ADD_TO_photos.json ..." 行，粘贴到仓库根目录 photos.json 数组里并提交。`;
     });
   </script>
 </body>
