@@ -4,7 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>周杳的个人主页</title>
-  <meta name="description" content="个人简介、项目与联系方式" />
+  <meta name="description" content="热爱把复杂问题拆解成优雅的产品与代码，同时热爱摄影" />
+  <!-- Open Graph：分享到微信/朋友圈时显示预览 -->
+  <meta property="og:title" content="周杳的个人主页" />
+  <meta property="og:description" content="热爱把复杂问题拆解成优雅的产品与代码，同时热爱摄影" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://hellofuck264.github.io" />
+  <!-- Favicon：渐变圆形 -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%234cc9f0'/><stop offset='100%25' stop-color='%23a78bfa'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23g)'/></svg>" />
   <style>
     :root {
       --bg: #060810;
@@ -369,7 +376,8 @@
         <div class="btns">
           <a class="btn btn-primary" href="#projects">查看项目</a>
           <a class="btn btn-ghost" href="#contact">约个时间聊聊</a>
-          <button id="adminToggle" class="btn btn-ghost" type="button">进入上传</button>
+          <!-- 上传入口：隐藏按钮，通过连按 U 键 5 次触发 -->
+          <button id="adminToggle" type="button" style="display:none" aria-hidden="true"></button>
         </div>
       </div>
       <div class="card">
@@ -387,8 +395,7 @@
     <section id="about">
       <div class="section-title">关于我</div>
       <div class="card">
-        <p>这里是更详细的自我介绍。你可以写职业经历、擅长技能、喜欢的技术栈、以及你正在寻找的机会。</p>
-        <p class="muted" style="margin-top:10px;font-size:14px">小提示：把这段文字精简为 3–5 句最有记忆点的话。</p>
+        <p>目前主要在做数据分析与 Python 自动化工作，同时在系统学习前端开发。热爱摄影，喜欢用镜头记录生活中的细节与光影。坚持每周写一篇博客，把工作中的思考和生活感悟沉淀下来。希望通过这个网站，认识更多有趣的朋友。</p>
       </div>
     </section>
 
@@ -490,7 +497,7 @@
     </section>
 
     <footer>
-      © <span id="y"></span> 周杳 · 建站于 GitHub Pages &nbsp;·&nbsp; <a href="#">↑ 返回顶部</a>
+      © <span id="y"></span> 周杳 &nbsp;·&nbsp; 建站于 GitHub Pages &nbsp;·&nbsp; <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑ 返回顶部</a>
     </footer>
   </div>
 
@@ -642,6 +649,16 @@
         } catch (err) { console.error(err); alert(err.message); }
       }
       prog.textContent = `完成：成功 ${okCnt}/${files.length}。提示：打开浏览器控制台，复制所有 "ADD_TO_photos.json ..." 行，粘贴到仓库根目录 photos.json 数组里并提交。`;
+    });
+
+    // —— 隐藏上传入口：连按 U 键 5 次（3秒内）触发 ——
+    let uCount = 0, uTimer;
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'u' && e.key !== 'U') return;
+      uCount++;
+      clearTimeout(uTimer);
+      uTimer = setTimeout(() => { uCount = 0; }, 3000);
+      if (uCount >= 5) { uCount = 0; adminToggle.click(); }
     });
 
     // —— 导航高亮 ——
