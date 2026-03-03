@@ -3,200 +3,486 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>我的个人主页</title>
+  <title>周杳的个人主页</title>
   <meta name="description" content="个人简介、项目与联系方式" />
   <style>
-    :root{
-      --bg:#0b0c10;
-      --card:#12141a;
-      --fg:#e8ecf1;
-      --muted:#a9b1bb;
-      --accent:#4cc9f0;
-      --accent-2:#a78bfa;
-      --max:1080px;
-      --radius:18px;
-      --shadow:0 10px 30px rgba(0,0,0,.35);
+    :root {
+      --bg: #060810;
+      --fg: #e8ecf1;
+      --muted: #8892a4;
+      --accent: #4cc9f0;
+      --accent-2: #a78bfa;
+      --accent-3: #f472b6;
+      --max: 1080px;
+      --radius: 20px;
+      --glass-bg: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.08);
+      --glass-hover-border: rgba(76,201,240,0.28);
     }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .wrap{max-width:var(--max);padding:24px;margin:0 auto}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin:8px 0 24px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:var(--shadow)}
-    nav a{margin-left:16px;color:var(--muted)}
-    nav a.active, nav a:hover{color:var(--fg)}
 
-    .hero{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
-    @media (max-width:860px){.hero{grid-template-columns:1fr}}
-    .card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
-    h1{font-size:clamp(28px,4.5vw,44px);margin:8px 0 12px}
-    .muted{color:var(--muted)}
-    .btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-    .btn{display:inline-block;padding:10px 16px;border-radius:12px;background:var(--accent);color:#081018;font-weight:600}
-    .btn.secondary{background:#1f2330;color:var(--fg);border:1px solid #2a3040}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    section{margin:28px 0}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    @media (max-width:860px){.grid{grid-template-columns:1fr}}
-    .item{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
-    .item h3{margin:6px 0 8px}
-    .tag{display:inline-block;padding:4px 8px;border:1px solid #2a3040;border-radius:999px;color:var(--muted);font-size:12px}
+    html { scroll-behavior: smooth; }
 
-    footer{margin:36px 0 8px;color:var(--muted);text-align:center;font-size:14px}
-    .split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    @media (max-width:860px){.split{grid-template-columns:1fr}}
-    input,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2a3040;background:#0f1218;color:var(--fg)}
-    textarea{min-height:120px;resize:vertical}
-    .mailto{word-break:break-all}
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-    /* 相册样式 */
-    #gallery .grid{grid-template-columns:repeat(4,1fr)}
-    @media (max-width:1024px){#gallery .grid{grid-template-columns:repeat(3,1fr)}}
-    @media (max-width:720px){#gallery .grid{grid-template-columns:repeat(2,1fr)}}
-    .photo-tile{position:relative;overflow:hidden;border-radius:var(--radius)}
-    .photo-tile img{width:100%;height:220px;object-fit:cover;display:block}
-    .photo-tile .cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent, rgba(0,0,0,.6));padding:8px 10px;font-size:12px}
-    .admin-only{display:none}
-    .admin-on .admin-only{display:block}
-    .hint{font-size:12px;color:var(--muted)}
+    /* ── 背景光晕 ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 20s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 700px; height: 700px; background: var(--accent);   opacity: .10; top: -220px; right: -180px; animation-duration: 22s; }
+    .orb-2 { width: 500px; height: 500px; background: var(--accent-2); opacity: .10; bottom: -100px; left: -150px; animation-duration: 28s; }
+    .orb-3 { width: 300px; height: 300px; background: var(--accent-3); opacity: .07; top: 45%; left: 38%; animation-duration: 18s; }
+    @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.08); } }
 
-    /* 联系表单状态 */
-    .form-msg{padding:10px 14px;border-radius:12px;margin-top:10px;display:none}
-    .form-msg.success{background:#0d2e1a;color:#4ade80;display:block}
-    .form-msg.error{background:#2e0d0d;color:#f87171;display:block}
+    /* ── 导航 ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(6,8,16,0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .logo {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 20px rgba(76,201,240,.4);
+      flex-shrink: 0;
+    }
+    .brand-text strong { font-size: 15px; }
+    .brand-text .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    nav { display: flex; gap: 4px; }
+    nav a {
+      padding: 6px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color .2s, background .2s;
+      text-decoration: none;
+    }
+    nav a:hover, nav a.active {
+      color: var(--fg);
+      background: rgba(255,255,255,0.07);
+    }
+
+    /* ── 主体 ── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 48px 24px 24px;
+    }
+
+    /* ── 玻璃卡片 ── */
+    .card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--glass-hover-border);
+      box-shadow: 0 24px 64px rgba(76,201,240,.10);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 860px) { .hero { grid-template-columns: 1fr; } }
+
+    h1 {
+      font-size: clamp(30px, 4.5vw, 46px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin: 10px 0 14px;
+      letter-spacing: -0.5px;
+    }
+    .grad {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .muted { color: var(--muted); }
+
+    /* ── 按钮 ── */
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s, opacity .2s;
+    }
+    .btn:hover { transform: translateY(-2px); opacity: .9; text-decoration: none; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #060810;
+      box-shadow: 0 8px 24px rgba(76,201,240,.3);
+    }
+    .btn-primary:hover { box-shadow: 0 12px 32px rgba(76,201,240,.45); }
+    .btn-ghost {
+      background: var(--glass-bg);
+      color: var(--fg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+    }
+    .btn-ghost:hover { border-color: var(--glass-hover-border); }
+
+    /* 保持原 .btn / .btn.secondary 兼容 */
+    .btn.secondary { background: var(--glass-bg); color: var(--fg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+
+    /* ── 当前在做 ── */
+    .now-list { list-style: none; margin: 10px 0 16px; display: flex; flex-direction: column; gap: 10px; }
+    .now-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .now-list li::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      flex-shrink: 0;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(76,201,240,.1);
+      color: var(--accent);
+      border: 1px solid rgba(76,201,240,.2);
+    }
+
+    /* ── Section 标题 ── */
+    section { margin: 52px 0; }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--glass-border), transparent);
+    }
+
+    /* ── 项目网格 ── */
+    .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+    .item {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform .3s, box-shadow .3s, border-color .3s;
+    }
+    .item:hover {
+      transform: translateY(-4px);
+      border-color: var(--glass-hover-border);
+      box-shadow: 0 20px 48px rgba(76,201,240,.1);
+    }
+    .item h3 { font-size: 17px; font-weight: 700; }
+    .item p { font-size: 14px; color: var(--muted); flex: 1; }
+    .item a { font-size: 14px; font-weight: 600; color: var(--accent); margin-top: 4px; }
+    .item a:hover { text-decoration: none; opacity: .8; }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      background: rgba(167,139,250,.12);
+      color: var(--accent-2);
+      border: 1px solid rgba(167,139,250,.2);
+      align-self: flex-start;
+    }
+
+    /* ── 相册 ── */
+    #gallery .grid { grid-template-columns: repeat(4,1fr); gap: 12px; }
+    @media (max-width: 1024px) { #gallery .grid { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width: 720px) { #gallery .grid { grid-template-columns: repeat(2,1fr); } }
+
+    .photo-tile {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+    }
+    .photo-tile img {
+      width: 100%; height: 200px;
+      object-fit: cover;
+      display: block;
+      transition: transform .4s ease;
+    }
+    .photo-tile:hover img { transform: scale(1.06); }
+    .photo-tile .cap {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,.7));
+      padding: 10px;
+      font-size: 12px;
+      color: #dde;
+    }
+
+    /* ── 联系 ── */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+
+    label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px; }
+    input, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.04);
+      color: var(--fg);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input:focus, textarea:focus { border-color: rgba(76,201,240,.4); }
+    textarea { min-height: 110px; resize: vertical; }
+
+    .mailto { word-break: break-all; margin: 12px 0; }
+
+    .form-field { margin-bottom: 12px; }
+
+    .form-msg { padding: 10px 16px; border-radius: 12px; margin-top: 12px; display: none; font-size: 14px; }
+    .form-msg.success { background: rgba(74,222,128,.1); color: #4ade80; border: 1px solid rgba(74,222,128,.2); display: block; }
+    .form-msg.error   { background: rgba(248,113,113,.1); color: #f87171; border: 1px solid rgba(248,113,113,.2); display: block; }
+
+    /* ── 管理上传面板 ── */
+    .admin-only { display: none; }
+    .admin-on .admin-only { display: block; }
+    .hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ── 灯箱 ── */
+    #lightbox {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(8px);
+    }
+    #lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 16px; box-shadow: 0 0 80px rgba(0,0,0,.8); }
+
+    /* ── Footer ── */
+    footer {
+      margin: 60px 0 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding-top: 24px;
+      border-top: 1px solid var(--glass-border);
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--fg); text-decoration: none; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <strong>周杳的网站</strong><div class="muted">摄影交流 / 数据分析 / 生活记录/  </div>
-        </div>
-      </div>
-      <nav>
-        <a href="#about" class="active">关于</a>
-        <a href="#projects">项目</a>
-        <a href="#gallery">相册</a>
-        <a href="#contact">联系</a>
-      </nav>
-    </header>
 
+  <!-- 背景光晕 -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- 导航 -->
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div class="brand-text">
+        <strong>周杳的网站</strong>
+        <div class="sub">摄影交流 / 数据分析 / 生活记录</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#about">关于</a>
+      <a href="#projects">项目</a>
+      <a href="#gallery">相册</a>
+      <a href="#contact">联系</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+
+    <!-- Hero -->
     <section class="hero">
       <div class="card">
-        <h1>你好，我是 <span style="color:var(--accent)">周杳</span> 👋</h1>
+        <h1>你好，我是<br><span class="grad">周杳</span> 👋</h1>
         <p class="muted">"热爱把复杂问题拆解成优雅的产品与代码，同时热爱摄影，希望能与世界的你们交流"。</p>
         <div class="btns">
-          <a class="btn" href="#projects">查看项目</a>
-          <a class="btn secondary" href="#contact">约个时间聊聊</a>
-          <button id="adminToggle" class="btn secondary" type="button" title="仅本人使用">进入上传</button>
+          <a class="btn btn-primary" href="#projects">查看项目</a>
+          <a class="btn btn-ghost" href="#contact">约个时间聊聊</a>
+          <button id="adminToggle" class="btn btn-ghost" type="button">进入上传</button>
         </div>
       </div>
       <div class="card">
-        <h2 style="margin:6px 0 8px">当前在做</h2>
-        <ul class="muted" style="margin:0 0 8px 18px">
-          <li>✳︎ 学习 Python / pandas 自动化日常表格处理</li>
-          <li>✳︎ 练习前端：HTML/CSS/JS</li>
-          <li>✳︎ 博客写作：每周一篇</li>
+        <div style="font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px">当前在做</div>
+        <ul class="now-list">
+          <li>学习 Python / pandas 自动化日常表格处理</li>
+          <li>练习前端：HTML / CSS / JS</li>
+          <li>博客写作：每周一篇</li>
         </ul>
-        <span class="tag">Last update: <script>document.write(new Date().toISOString().slice(0,10))</script></span>
+        <span class="badge">Last update: <script>document.write(new Date().toISOString().slice(0,10))</script></span>
       </div>
     </section>
 
+    <!-- 关于我 -->
     <section id="about">
-      <h2>关于我</h2>
+      <div class="section-title">关于我</div>
       <div class="card">
         <p>这里是更详细的自我介绍。你可以写职业经历、擅长技能、喜欢的技术栈、以及你正在寻找的机会。</p>
-        <p class="muted">小提示：把这段文字精简为 3–5 句最有记忆点的话。</p>
+        <p class="muted" style="margin-top:10px;font-size:14px">小提示：把这段文字精简为 3–5 句最有记忆点的话。</p>
       </div>
     </section>
 
+    <!-- 项目 -->
     <section id="projects">
-      <h2>项目</h2>
+      <div class="section-title">项目</div>
       <div class="grid">
         <article class="item">
           <span class="tag">Python</span>
           <h3>Excel 自动化工具</h3>
-          <p class="muted">用 pandas / openpyxl 批量清洗与汇总指标，一键导出日报。</p>
+          <p>用 pandas / openpyxl 批量清洗与汇总指标，一键导出日报。</p>
           <a href="#" aria-label="项目链接">查看代码 →</a>
         </article>
         <article class="item">
           <span class="tag">Web</span>
           <h3>个人博客</h3>
-          <p class="muted">记录工作流、读书与生活感悟，支持全文检索与暗色模式。</p>
+          <p>记录工作流、读书与生活感悟，支持全文检索与暗色模式。</p>
           <a href="#">访问网站 →</a>
         </article>
         <article class="item">
           <span class="tag">Data</span>
           <h3>可视化面板</h3>
-          <p class="muted">用 ECharts / Plotly 做的业务看板，自动拉取最新数据。</p>
+          <p>用 ECharts / Plotly 做的业务看板，自动拉取最新数据。</p>
           <a href="#">在线预览 →</a>
         </article>
       </div>
     </section>
 
-    <!-- 相册 + 上传 -->
+    <!-- 相册 -->
     <section id="gallery">
-      <h2>相册</h2>
+      <div class="section-title">相册</div>
 
-      <div class="card admin-only" id="uploader">
-        <h3 style="margin:0 0 8px">上传照片（仅本人）</h3>
+      <div class="card admin-only" id="uploader" style="margin-bottom:20px">
+        <h3 style="margin-bottom:10px">上传照片（仅本人）</h3>
         <p class="hint">说明：GitHub Pages 是静态托管，无法直接保存上传文件。这里采用 <a href="https://cloudinary.com/" target="_blank">Cloudinary</a> 的<strong>无签名上传</strong>；所有人可见的相册来自仓库根目录的 <code>photos.json</code> 公共清单。</p>
-        <div class="split">
+        <div class="split" style="margin-top:16px">
           <div>
             <label>Cloudinary cloudName</label>
             <input id="cloudName" value="dxyy1ocju" placeholder="例：demo" />
-            <label style="margin-top:8px;display:block">uploadPreset（无签名）</label>
+            <label style="margin-top:12px">uploadPreset（无签名）</label>
             <input id="uploadPreset" value="ghuakzji" placeholder="例：gallery_unsigned" />
-            <label style="margin-top:8px;display:block">可选：目标文件夹</label>
+            <label style="margin-top:12px">可选：目标文件夹</label>
             <input id="folder" placeholder="例：site-gallery" />
           </div>
           <div>
             <label>选择图片</label>
             <input id="fileInput" type="file" accept="image/*" multiple />
-            <label style="margin-top:8px;display:block">可选：统一标签（便于后台管理）</label>
+            <label style="margin-top:12px">可选：统一标签</label>
             <input id="tags" placeholder="例：site-gallery" />
-            <div class="btns" style="margin-top:10px">
-              <button class="btn" id="uploadBtn" type="button">开始上传</button>
-              <button class="btn secondary" id="clearLocal" type="button" title="只清除本机记录，不会删除 Cloudinary 上的图片">清除本机记录</button>
+            <div class="btns" style="margin-top:14px">
+              <button class="btn btn-primary" id="uploadBtn" type="button">开始上传</button>
+              <button class="btn btn-ghost" id="clearLocal" type="button">清除本机记录</button>
             </div>
-            <p class="hint">上传后会即时出现在下方网格中；并在控制台打印一行可直接粘贴到 <code>photos.json</code> 的 JSON。把它追加进仓库的 <code>photos.json</code> 并 <code>git push</code> 后，任何人刷新页面都能看到。</p>
+            <p class="hint" style="margin-top:10px">上传后即时显示；控制台会打印 <code>ADD_TO_photos.json</code> 行，复制追加到 <code>photos.json</code> 并 push 后所有人可见。</p>
           </div>
         </div>
-        <div id="prog" class="hint"></div>
+        <div id="prog" class="hint" style="margin-top:10px"></div>
       </div>
 
       <div class="grid" id="galleryGrid"></div>
 
-      <!-- 轻量灯箱 -->
-      <div id="lightbox" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:9999">
-        <img id="lightbox-img" src="" alt="" style="max-width:90vw;max-height:90vh;border-radius:12px">
+      <div id="lightbox">
+        <img id="lightbox-img" src="" alt="">
       </div>
     </section>
 
+    <!-- 联系 -->
     <section id="contact">
-      <h2>联系我</h2>
+      <div class="section-title">联系我</div>
       <div class="split">
         <div class="card">
-          <p class="muted">最快方式：给我发邮件。</p>
-          <p class="mailto"><a href="mailto:zhouyao677@gmail.com" class="btn">zhouyao677@gmail.com</a></p>
-          <p class="muted">也可以直接填右边的表单，我会收到邮件通知。</p>
+          <p class="muted" style="font-size:14px">最快方式：给我发邮件。</p>
+          <p class="mailto">
+            <a href="mailto:zhouyao677@gmail.com" class="btn btn-primary" style="margin-top:12px;display:inline-flex">
+              ✉ zhouyao677@gmail.com
+            </a>
+          </p>
+          <p class="muted" style="margin-top:16px;font-size:14px">也可以直接填右边的表单，我会收到邮件通知。</p>
         </div>
         <div class="card">
-          <!-- Formspree 表单：将 YOUR_FORM_ID 替换为你在 formspree.io 获得的表单 ID -->
           <form id="contactForm">
-            <label>你的称呼</label>
-            <input name="name" placeholder="张三" required />
-            <label style="margin-top:8px;display:block">你的邮箱</label>
-            <input type="email" name="email" placeholder="name@example.com" required />
-            <label style="margin-top:8px;display:block">想聊什么</label>
-            <textarea name="message" placeholder="简单说说你的需求……"></textarea>
-            <div class="btns" style="margin-top:10px">
-              <button class="btn" type="submit" id="submitBtn">发送</button>
+            <div class="form-field">
+              <label>你的称呼</label>
+              <input name="name" placeholder="张三" required />
             </div>
+            <div class="form-field">
+              <label>你的邮箱</label>
+              <input type="email" name="email" placeholder="name@example.com" required />
+            </div>
+            <div class="form-field">
+              <label>想聊什么</label>
+              <textarea name="message" placeholder="简单说说你的需求……"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit" id="submitBtn" style="width:100%;justify-content:center">发送消息</button>
             <div id="formMsg" class="form-msg"></div>
           </form>
         </div>
@@ -204,7 +490,7 @@
     </section>
 
     <footer>
-      © <span id="y"></span> 你的名字 · 建站于 GitHub Pages / Vercel · <a href="#">返回顶部</a>
+      © <span id="y"></span> 周杳 · 建站于 GitHub Pages &nbsp;·&nbsp; <a href="#">↑ 返回顶部</a>
     </footer>
   </div>
 
@@ -237,7 +523,6 @@
     }
 
     // —— 联系表单：通过 Formspree 发送 ——
-    // 使用前：去 https://formspree.io 注册，创建表单后把下面的 YOUR_FORM_ID 换成你的 ID
     const FORMSPREE_ID = 'xkovlqve';
 
     document.getElementById('contactForm').addEventListener('submit', async (e) => {
@@ -273,7 +558,7 @@
         msg.className = 'form-msg error';
         msg.textContent = '发送失败，请直接发邮件到 zhouyao677@gmail.com';
       } finally {
-        btn.textContent = '发送';
+        btn.textContent = '发送消息';
         btn.disabled = false;
       }
     });
@@ -358,6 +643,20 @@
       }
       prog.textContent = `完成：成功 ${okCnt}/${files.length}。提示：打开浏览器控制台，复制所有 "ADD_TO_photos.json ..." 行，粘贴到仓库根目录 photos.json 数组里并提交。`;
     });
+
+    // —— 导航高亮 ——
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          navLinks.forEach(a => a.classList.remove('active'));
+          const active = document.querySelector(`nav a[href="#${e.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    sections.forEach(s => observer.observe(s));
   </script>
 </body>
 </html>
