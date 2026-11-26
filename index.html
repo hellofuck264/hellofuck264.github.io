@@ -14,22 +14,20 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%234cc9f0'/><stop offset='100%25' stop-color='%23a78bfa'/></linearGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23g)'/></svg>" />
   <style>
     :root {
-      --bg: #060810;
-      --fg: #e8ecf1;
-      --muted: #8892a4;
-      --accent: #4cc9f0;
-      --accent-2: #a78bfa;
-      --accent-3: #f472b6;
+      color-scheme: light;
+      --bg: #fcf9f3;
+      --fg: #25263a;
+      --muted: #54566b;
+      --accent: #4e40a1;
+      --accent-2: #65529a;
       --max: 1080px;
-      --radius: 20px;
-      --glass-bg: rgba(255,255,255,0.04);
-      --glass-border: rgba(255,255,255,0.08);
-      --glass-hover-border: rgba(76,201,240,0.28);
+      --radius: 17px;
+      --glass-bg: #fff;
+      --glass-border: #dedbe7;
+      --glass-hover-border: #a598cc;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
 
     body {
       background: var(--bg);
@@ -38,20 +36,6 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
-    /* ── 背景光晕 ── */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(120px);
-      pointer-events: none;
-      z-index: 0;
-      animation: drift 20s ease-in-out infinite alternate;
-    }
-    .orb-1 { width: 700px; height: 700px; background: var(--accent);   opacity: .10; top: -220px; right: -180px; animation-duration: 22s; }
-    .orb-2 { width: 500px; height: 500px; background: var(--accent-2); opacity: .10; bottom: -100px; left: -150px; animation-duration: 28s; }
-    .orb-3 { width: 300px; height: 300px; background: var(--accent-3); opacity: .07; top: 45%; left: 38%; animation-duration: 18s; }
-    @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.08); } }
 
     /* ── 导航 ── */
     header {
@@ -62,7 +46,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 14px 32px;
-      background: rgba(6,8,16,0.7);
+      background: #fcf9f3f5;
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border-bottom: 1px solid var(--glass-border);
@@ -88,7 +72,7 @@
     }
     nav a:hover, nav a.active {
       color: var(--fg);
-      background: rgba(255,255,255,0.07);
+      background: #efedf7;
     }
 
     /* ── 主体 ── */
@@ -116,29 +100,6 @@
       box-shadow: 0 24px 64px rgba(76,201,240,.10);
     }
 
-    /* ── Hero ── */
-    .hero {
-      display: grid;
-      grid-template-columns: 1.35fr 1fr;
-      gap: 20px;
-      align-items: center;
-      margin-bottom: 48px;
-    }
-    @media (max-width: 860px) { .hero { grid-template-columns: 1fr; } }
-
-    h1 {
-      font-size: clamp(30px, 4.5vw, 46px);
-      font-weight: 800;
-      line-height: 1.2;
-      margin: 10px 0 14px;
-      letter-spacing: -0.5px;
-    }
-    .grad {
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
     .muted { color: var(--muted); }
 
     /* ── 按钮 ── */
@@ -159,7 +120,7 @@
     .btn:hover { transform: translateY(-2px); opacity: .9; text-decoration: none; }
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #060810;
+      color: #fff;
       box-shadow: 0 8px 24px rgba(76,201,240,.3);
     }
     .btn-primary:hover { box-shadow: 0 12px 32px rgba(76,201,240,.45); }
@@ -294,14 +255,14 @@
       padding: 12px 16px;
       border-radius: 12px;
       border: 1px solid var(--glass-border);
-      background: rgba(255,255,255,0.04);
+      background: #fff;
       color: var(--fg);
       font-size: 14px;
       font-family: inherit;
       outline: none;
       transition: border-color .2s;
     }
-    input:focus, textarea:focus { border-color: rgba(76,201,240,.4); }
+    input:focus, textarea:focus { border-color: var(--accent); }
     textarea { min-height: 110px; resize: vertical; }
 
     .mailto { word-break: break-all; margin: 12px 0; }
@@ -309,8 +270,8 @@
     .form-field { margin-bottom: 12px; }
 
     .form-msg { padding: 10px 16px; border-radius: 12px; margin-top: 12px; display: none; font-size: 14px; }
-    .form-msg.success { background: rgba(74,222,128,.1); color: #4ade80; border: 1px solid rgba(74,222,128,.2); display: block; }
-    .form-msg.error   { background: rgba(248,113,113,.1); color: #f87171; border: 1px solid rgba(248,113,113,.2); display: block; }
+    .form-msg.success { background: rgba(74,222,128,.1); color: #136836; border: 1px solid rgba(74,222,128,.2); display: block; }
+    .form-msg.error   { background: rgba(248,113,113,.1); color: #a72436; border: 1px solid rgba(248,113,113,.2); display: block; }
 
     /* ── 管理上传面板 ── */
     .admin-only { display: none; }
@@ -340,93 +301,263 @@
     }
     footer a { color: var(--muted); }
     footer a:hover { color: var(--fg); text-decoration: none; }
+
+  .homepage .zy-intro {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin: 0;
+    display: grid;
+    align-items: center;
+    min-height: 344px;
+    padding: 60px clamp(20px, 5vw, 56px);
+    background: #fff2e4;
+  }
+  .homepage .zy-intro-copy {
+    position: relative; width: 100%; max-width: 30rem;
+    margin-left: max(0px, calc((100% - var(--max)) / 2));
+  }
+  .homepage .zy-intro::after {
+    position: absolute; z-index: -2; inset: 0; content: ""; pointer-events: none;
+    background: linear-gradient(90deg, #fff2e4 3%, #fff2e4 34%, #fff2e4ed 42%, #fff2e47a 54%, transparent 70%);
+  }
+  .homepage .zy-coast {
+    position: absolute; z-index: -3; inset: 0; overflow: hidden; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 75% 60%, #ffd795 0%, transparent 43%),
+      linear-gradient(157deg, #f2c8e5 0%, #d0b7ec 29%, #f4a5be 53%, #ffc2a5 75%);
+  }
+  .homepage .zy-coast span { position: absolute; display: block; }
+  .homepage .zy-sun {
+    width: clamp(121px, 23vw, 215px); aspect-ratio: 1;
+    left: 76%; top: 10%; transform: translateX(-50%);
+    border-radius: 50%; background: linear-gradient(#fffbd5 3%, #ffdb81 51%, #fc8387 100%);
+    mask-image: linear-gradient(#000 0 52%, transparent 52%), repeating-linear-gradient(#000 0 9px, transparent 9px 15px);
+  }
+  .homepage .zy-water {
+    inset: 72% 0 0;
+    background:
+      radial-gradient(ellipse at 77% 2%, #ffdb9bcc 0%, transparent 25%),
+      repeating-linear-gradient(0deg, transparent 0 6px, #ffe8cf58 7px 8px, transparent 10px 15px),
+      linear-gradient(#a886cb 5%, #b3abd5 38%, #91c9d7);
+    border-top: 2px solid #ffe4b9;
+  }
+  .homepage .zy-skyline {
+    bottom: 27%; left: 35%; width: 67%;
+    clip-path: polygon(
+      0 100%, 0 82%, 5% 82%, 5% 67%, 10% 67%, 10% 74%, 13% 74%, 13% 54%, 17% 54%, 17% 66%,
+      21% 66%, 21% 40%, 25% 40%, 25% 36%, 28% 36%, 28% 66%, 31% 66%, 31% 53%, 35% 53%, 35% 75%,
+      38% 75%, 38% 58%, 42% 58%, 42% 29%, 44% 29%, 44% 14%, 45% 14%, 45% 29%, 47% 29%, 47% 65%,
+      50% 65%, 50% 52%, 54% 52%, 54% 74%, 57% 74%, 57% 46%, 61% 46%, 61% 58%, 65% 58%, 65% 79%,
+      69% 79%, 69% 39%, 70% 39%, 70% 32%, 74% 32%, 74% 44%, 77% 44%, 77% 69%, 80% 69%, 80% 53%,
+      84% 53%, 84% 63%, 88% 63%, 88% 35%, 91% 35%, 91% 59%, 94% 59%, 94% 73%, 100% 73%, 100% 100%
+    );
+  }
+  .homepage .zy-skyline-distant {
+    height: 34%; background: #b57aa9; transform: translate(-7%, -9%) scaleX(1.13); opacity: .58;
+  }
+  .homepage .zy-skyline-near {
+    height: 30%;
+    background: repeating-linear-gradient(0deg, #533d72 0 7px, #65487f 7px 9px, #533d72 9px 12px);
+  }
+  .homepage .zy-palm {
+    width: 128px; height: 178px; color: #492e5c; bottom: 11%; transform-origin: bottom center;
+  }
+  .homepage .zy-palm::before, .homepage .zy-palm::after {
+    position: absolute; content: ""; background: currentColor;
+  }
+  .homepage .zy-palm::before {
+    width: 100%; height: 45%;
+    clip-path: polygon(
+      48% 41%, 35% 24%, 21% 20%, 7% 27%, 0% 40%, 12% 34%, 23% 32%, 35% 36%, 45% 49%,
+      31% 43%, 17% 47%, 5% 60%, 2% 76%, 12% 62%, 27% 56%, 41% 56%, 48% 61%,
+      41% 65%, 33% 78%, 31% 97%, 40% 82%, 49% 72%, 56% 64%, 64% 68%, 76% 81%, 81% 93%,
+      81% 74%, 72% 60%, 63% 56%, 75% 54%, 88% 59%, 98% 72%, 94% 54%, 85% 44%, 73% 39%, 63% 43%,
+      70% 31%, 80% 25%, 94% 23%, 100% 26%, 89% 13%, 74% 15%, 62% 25%, 55% 38%,
+      54% 20%, 46% 8%, 33% 0%, 41% 15%, 46% 27%
+    );
+  }
+  .homepage .zy-palm::after {
+    inset: 25% 25% 0 41%;
+    clip-path: polygon(40% 0, 48% 0, 48% 22%, 55% 49%, 69% 76%, 90% 100%, 66% 100%, 52% 78%, 42% 52%, 36% 25%);
+  }
+  .homepage .zy-palm-right { right: 3%; bottom: 9%; transform: rotate(-9deg) scale(1.12); }
+  .homepage .zy-palm-left { right: 35%; transform: scale(-.62, .62); color: #634473; }
+  .homepage .zy-coastal-portrait {
+    position: absolute; z-index: -1; display: block; bottom: 0; right: 11%; pointer-events: none;
+    width: auto; height: 92%;
+  }
+  .homepage .zy-topline { font-size: 12px; letter-spacing: .09em; color: var(--accent); }
+  .homepage .zy-intro h1 { margin: 10px 0 8px; font-size: clamp(29px, 6vw, 57px); font-weight: 720; line-height: 1.16; letter-spacing: -.035em; }
+  .homepage .zy-tagline { color: var(--muted); font-size: clamp(15px, 2.25vw, 20px); }
+  .homepage .zy-actions { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-top: 23px; }
+  .homepage .zy-actions a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 9px; }
+  .homepage .zy-cta { background: var(--accent); color: #fff; font-weight: 650; }
+  .homepage .zy-secondary { background: #fff8ee; color: var(--fg); border: 1px solid #9390aa; }
+  @media (max-width: 720px) {
+    .homepage .zy-intro { align-items: start; padding-block: 32px 177px; min-height: 0; }
+    .homepage .zy-intro::after {
+      background: linear-gradient(180deg, #fff2e4 47%, #fff2e4 53%, #fff2e46b 66%, transparent 81%);
+    }
+    .homepage .zy-coast { top: 46%; }
+    .homepage .zy-sun { width: 112px; top: 15%; left: 69%; }
+    .homepage .zy-skyline { left: 0; width: 104%; }
+    .homepage .zy-palm-right { right: -5%; transform: rotate(-7deg) scale(.7); }
+    .homepage .zy-palm-left { right: 53%; transform: scale(-.52, .52); }
+    .homepage .zy-coastal-portrait { right: 14%; height: 51%; }
+  }
+
+
+    .homepage :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .homepage section[id] { scroll-margin-top: 95px; }
+    .homepage .zy-actions a { text-decoration: none; }
+    .homepage .zy-actions a:hover { text-decoration: underline; text-underline-offset: 4px; }
+    .site-nav-inner {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+      max-width: var(--max); width: 100%; column-gap: 14px; row-gap: 7px; margin-inline: auto;
+    }
+    .homepage .brand-text strong { font-size: 17px; }
+    .homepage .logo { width: 12px; height: 12px; box-shadow: none; }
+    .homepage .wrap { padding-top: 0; }
+    .homepage #about { margin-top: 40px; }
+    .now-card { margin-top: 16px; }
+    .projects-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+    #projects .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #projects .featured-item { grid-column: 1 / -1; }
+    #projects .featured-item h3 { font-size: clamp(21px, 3vw, 27px); }
+    .project-flow { display: flex; flex-wrap: wrap; gap: 5px 8px; align-items: center; font-size: 13px; margin-block: 7px; }
+    .project-flow span { background: #efedf7; border-radius: 5px; padding: 3px 8px; }
+    .project-flow span[aria-hidden] { background: none; color: var(--muted); padding-inline: 0; }
+    .project-status { font-size: 13px; color: var(--muted); }
+    .site-questions { background: #f2effb; border: 1px solid #d8d1ee; border-radius: 14px; box-shadow: 0 10px 24px #33296114; }
+    .site-questions summary { cursor: pointer; padding: 13px 16px; font-weight: 700; }
+    .site-questions-content { border-top: 1px solid #dedbe7; padding: 14px 16px; }
+    .site-questions-answer { min-height: 60px; background: #fff; border-radius: 8px; padding: 9px 11px; font-size: 14px; }
+    .site-questions-answer a { display: inline-block; color: var(--accent); }
+    .site-questions-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .site-questions-options button {
+      color: var(--accent); background: transparent; border: 1px solid #9388be; border-radius: 7px;
+      min-height: 40px; padding: 4px 8px; font: inherit; font-size: 13px; cursor: pointer;
+    }
+    .site-questions-options button:hover { background: #e5dcf7; }
+    @media (max-width: 720px) {
+      .homepage section[id] { scroll-margin-top: 115px; }
+      .homepage header { padding: 10px 18px; }
+      .homepage header nav { flex-wrap: wrap; }
+      .homepage header nav a { padding: 6px 10px; }
+      .wrap { padding-inline: 16px; }
+      .projects-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      #projects .grid { grid-template-columns: 1fr; }
+    }
+    @media (pointer: coarse) {
+      .site-questions-options button { min-height: 44px; }
+    }
   </style>
 </head>
-<body>
-
-  <!-- 背景光晕 -->
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+<body class="homepage">
 
   <!-- 导航 -->
   <header>
-    <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <div class="brand-text">
-        <strong>周杳的网站</strong>
-        <div class="sub">摄影交流 / 数据分析 / 生活记录</div>
+    <div class="site-nav-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="brand-text"><strong>周杳</strong></div>
       </div>
+      <nav aria-label="网站导航">
+        <a href="#about">关于</a>
+        <a href="#projects">项目</a>
+        <a href="#gallery">相册</a>
+        <a href="#contact">联系</a>
+      </nav>
     </div>
-    <nav>
-      <a href="#about">关于</a>
-      <a href="#projects">项目</a>
-      <a href="#gallery">相册</a>
-      <a href="#contact">联系</a>
-    </nav>
   </header>
 
-  <div class="wrap">
-
-    <!-- Hero -->
-    <section class="hero">
-      <div class="card">
-        <h1>你好，我是<br><span class="grad">周杳</span> 👋</h1>
-        <p class="muted">"热爱把复杂问题拆解成优雅的产品与代码，同时热爱摄影，希望能与世界的你们交流"。</p>
-        <div class="btns">
-          <a class="btn btn-primary" href="#projects">查看项目</a>
-          <a class="btn btn-ghost" href="#contact">约个时间聊聊</a>
-          <!-- 上传入口：隐藏按钮，通过连按 U 键 5 次触发 -->
-          <button id="adminToggle" type="button" style="display:none" aria-hidden="true"></button>
-        </div>
+  <section class="zy-intro" aria-labelledby="homepage-title">
+    <!-- Sunset layering and sun mask inspired by kmikeym/motion-backgrounds
+         https://github.com/kmikeym/motion-backgrounds/blob/main/examples/05-synthwave-sunset.html (CC0-1.0) -->
+    <div class="zy-coast" aria-hidden="true">
+      <span class="zy-sun"></span>
+      <span class="zy-water"></span>
+      <span class="zy-skyline zy-skyline-distant"></span>
+      <span class="zy-skyline zy-skyline-near"></span>
+      <span class="zy-palm zy-palm-left"></span>
+      <span class="zy-palm zy-palm-right"></span>
+    </div>
+    <canvas class="zy-coastal-portrait" width="720" height="840" aria-hidden="true"></canvas>
+    <div class="zy-intro-copy">
+      <p class="zy-topline">个人主页 / 数据分析与摄影</p>
+      <h1 id="homepage-title">你好，我是周杳</h1>
+      <p class="zy-tagline">用数据解决问题，用镜头记录生活。</p>
+      <div class="zy-actions">
+        <a class="zy-cta" href="#projects">查看项目 <span aria-hidden="true">↓</span></a>
+        <a class="zy-secondary" href="#gallery">浏览相册 <span aria-hidden="true">↗</span></a>
       </div>
+    </div>
+    <button id="adminToggle" type="button" hidden aria-hidden="true"></button>
+  </section>
+
+  <main class="wrap">
+    <!-- 关于我 -->
+    <section id="about">
+      <h2 class="section-title">关于我</h2>
       <div class="card">
+        <p>目前主要在做数据分析与 Python 自动化工作，同时在系统学习前端开发。热爱摄影，喜欢用镜头记录生活中的细节与光影。坚持每周写一篇博客，把工作中的思考和生活感悟沉淀下来。希望通过这个网站，认识更多有趣的朋友。</p>
+      </div>
+      <div class="card now-card">
         <div style="font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px">当前在做</div>
         <ul class="now-list">
           <li>学习 Python / pandas 自动化日常表格处理</li>
           <li>练习前端：HTML / CSS / JS</li>
           <li>博客写作：每周一篇</li>
         </ul>
-        <span class="badge">Last update: <script>document.write(new Date().toISOString().slice(0,10))</script></span>
-      </div>
-    </section>
-
-    <!-- 关于我 -->
-    <section id="about">
-      <div class="section-title">关于我</div>
-      <div class="card">
-        <p>目前主要在做数据分析与 Python 自动化工作，同时在系统学习前端开发。热爱摄影，喜欢用镜头记录生活中的细节与光影。坚持每周写一篇博客，把工作中的思考和生活感悟沉淀下来。希望通过这个网站，认识更多有趣的朋友。</p>
       </div>
     </section>
 
     <!-- 项目 -->
     <section id="projects">
-      <div class="section-title">项目</div>
-      <div class="grid">
-        <article class="item">
-          <span class="tag">Python</span>
-          <h3>Excel 自动化工具</h3>
-          <p>用 pandas / openpyxl 批量清洗与汇总指标，一键导出日报。</p>
-          <a href="excel-tool.html" aria-label="项目链接">查看详情 →</a>
-        </article>
-        <article class="item">
-          <span class="tag">Web</span>
-          <h3>个人博客</h3>
-          <p>记录工作流、读书与生活感悟，支持全文检索与暗色模式。</p>
-          <a href="#">访问网站 →</a>
-        </article>
-        <article class="item">
-          <span class="tag">Data</span>
-          <h3>可视化面板</h3>
-          <p>用 ECharts / Plotly 做的业务看板，自动拉取最新数据。</p>
-          <a href="#">在线预览 →</a>
-        </article>
+      <h2 class="section-title">精选项目</h2>
+      <div class="projects-layout">
+        <div class="grid">
+          <article class="item featured-item">
+            <span class="tag">Python</span>
+            <h3>Excel 自动化工具</h3>
+            <p>用 pandas / openpyxl 批量清洗与汇总指标，一键导出日报。</p>
+            <div class="project-flow" aria-label="原始表格经过清洗汇总后生成日报">
+              <span>原始表格</span><span aria-hidden="true">→</span><span>清洗汇总</span><span aria-hidden="true">→</span><span>标准日报</span>
+            </div>
+            <a href="excel-tool.html">查看项目详情 →</a>
+          </article>
+          <article class="item">
+            <span class="tag">Web</span>
+            <h3>个人博客</h3>
+            <p>记录工作流、读书与生活感悟，支持全文检索与暗色模式。</p>
+            <span class="project-status">筹备中</span>
+          </article>
+          <article class="item">
+            <span class="tag">Data</span>
+            <h3>可视化面板</h3>
+            <p>用 ECharts / Plotly 做的业务看板，自动拉取最新数据。</p>
+            <span class="project-status">筹备中</span>
+          </article>
+        </div>
+        <details class="site-questions" open>
+          <summary>站点问答</summary>
+          <div class="site-questions-content">
+            <div class="site-questions-answer" aria-live="polite">你好！想了解项目还是相册？</div>
+            <div class="site-questions-options" aria-label="常见问题">
+              <button type="button" data-site-topic="excel">Excel 工具怎么用？</button>
+              <button type="button" data-site-topic="gallery">相册在哪？</button>
+            </div>
+          </div>
+        </details>
       </div>
     </section>
 
     <!-- 相册 -->
     <section id="gallery">
-      <div class="section-title">相册</div>
+      <h2 class="section-title">相册</h2>
 
       <div class="card admin-only" id="uploader" style="margin-bottom:20px">
         <h3 style="margin-bottom:10px">上传照片（仅本人）</h3>
@@ -464,7 +595,7 @@
 
     <!-- 联系 -->
     <section id="contact">
-      <div class="section-title">联系我</div>
+      <h2 class="section-title">联系我</h2>
       <div class="split">
         <div class="card">
           <p class="muted" style="font-size:14px">最快方式：给我发邮件。</p>
@@ -499,7 +630,7 @@
     <footer>
       © <span id="y"></span> 周杳 &nbsp;·&nbsp; 建站于 GitHub Pages &nbsp;·&nbsp; <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑ 返回顶部</a>
     </footer>
-  </div>
+  </main>
 
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
@@ -674,6 +805,125 @@
       });
     }, { rootMargin: '-40% 0px -55% 0px' });
     sections.forEach(s => observer.observe(s));
+  </script>
+  <script>
+  (() => {
+    const canvas = document.querySelector(".zy-coastal-portrait");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.scale(2, 2);
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    const ink = "#322341";
+    const fill = (shape, color, edge, width = 2) => {
+      const path = new Path2D(shape);
+      ctx.fillStyle = color;
+      ctx.fill(path);
+      if (edge) {
+        ctx.strokeStyle = edge;
+        ctx.lineWidth = width;
+        ctx.stroke(path);
+      }
+    };
+    const line = (shape, color, width = 2) => {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke(new Path2D(shape));
+    };
+
+    const jacket = "M27 420 L39 334 Q45 285 86 269 L128 250 L164 226 L215 230 L246 250 L278 264 Q319 277 330 322 L350 420 Z";
+    const teal = ctx.createLinearGradient(25, 385, 328, 255);
+    teal.addColorStop(0, "#134d64");
+    teal.addColorStop(.48, "#167b7f");
+    teal.addColorStop(1, "#59b9a7");
+    fill(jacket, teal, ink, 4);
+    ctx.save();
+    ctx.clip(new Path2D(jacket));
+    const leaf = "M0 22 C0 11 8 1 25 0 C24 9 17 22 0 22 Z";
+    const petals = "M0 0 C-24 -8 -23 -22 -13 -23 C-5 -24 -1 -15 1 -10 C4 -26 18 -29 22 -18 C25 -10 17 -3 10 1 C26 4 26 17 16 20 C7 24 2 14 0 8 C-6 24 -19 24 -21 14 C-24 6 -11 4 0 0 Z";
+    const print = [
+      [74, 300, -28, .73], [109, 346, 30, 1], [203, 370, -14, .95],
+      [251, 293, 16, .92], [302, 347, -40, 1], [269, 412, 24, .86],
+      [155, 421, 15, .88], [65, 409, -20, .84], [329, 418, 15, .72]
+    ];
+    print.forEach(([x, y, angle, size]) => {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle * Math.PI / 180);
+      ctx.scale(size, size);
+      fill(leaf, "#a1cc9b");
+      ctx.rotate(Math.PI);
+      fill(leaf, "#357b81");
+      ctx.rotate(1.2);
+      fill(petals, "#f3d5a5");
+      fill("M-3 -2 A4 4 0 1 1 3 3 A4 4 0 0 1 -3 -2", "#bc766e");
+      line("M0 0 Q-4 10 -9 15 M0 0 Q7 -4 10 -13", "#cd927b", 1.2);
+      ctx.restore();
+    });
+    fill("M27 420 L47 306 Q65 312 67 332 L57 420 Z", "#21445980");
+    fill("M267 269 Q314 284 330 324 L350 420 L313 420 Q308 351 290 318 Z", "#15576f69");
+    line("M82 280 Q66 309 59 379 M275 270 Q302 297 313 344 M122 280 L95 415 M235 304 Q242 344 246 420", "#d1d4a96e", 1.5);
+    ctx.restore();
+
+    const skin = ctx.createLinearGradient(122, 151, 232, 193);
+    skin.addColorStop(0, "#b76765");
+    skin.addColorStop(.57, "#dd9169");
+    skin.addColorStop(1, "#f2ba81");
+    fill("M147 191 Q154 228 134 249 L163 295 L186 324 L225 271 L236 245 Q214 234 218 196 Z", skin, ink, 3);
+    fill("M149 194 Q178 225 217 205 L218 225 Q195 240 158 228 L148 249 L140 246 Z", "#97515b");
+    fill("M147 232 Q158 254 183 276 L187 321 L142 286 L114 295 L123 264 Z", "#165769", ink);
+    fill("M222 228 L251 251 L263 288 L232 275 L187 321 L204 272 Z", "#247d82", ink);
+    fill("M129 254 L143 239 Q155 262 171 280 L184 314 L143 280 L120 286 Z", "#65b3a0");
+    fill("M223 236 L243 253 L254 276 L233 266 L200 293 Z", "#75bcaa");
+    line("M186 326 Q177 367 181 419 M186 339 L191 337", "#153e57", 2.5);
+    fill("M167 290 Q181 302 201 280 Q198 299 188 306 Q176 310 167 290 Z", "#ba6f5f");
+    line("M150 249 Q167 283 186 289 Q207 271 222 242", "#dfaf65", 2.5);
+    fill("M182 287 L191 287 L192 295 L184 297 Z", "#f6cb79", "#8f595a", 1);
+
+    const face = "M126 98 Q141 67 188 71 Q219 73 231 107 L234 152 L224 171 Q218 197 200 212 Q183 224 169 220 Q142 213 127 188 L120 176 L110 169 Q104 165 108 158 L120 139 Z";
+    fill(face, skin, ink, 3.2);
+    fill("M125 100 Q128 86 149 76 L157 87 L147 113 L142 151 Q135 168 133 181 L143 200 Q131 194 125 181 L121 177 L110 169 Q104 165 108 158 L120 140 Z", "#bc6f66");
+    fill("M207 86 Q231 92 232 117 L232 155 L219 169 Q216 193 201 207 L185 216 L170 217 L180 211 Q198 197 200 174 L205 132 Z", "#f0b180");
+    fill("M137 174 Q150 175 162 180 L155 185 L139 183 Z", "#86474e");
+    line("M126 148 Q116 157 113 165 L126 168 M137 184 Q149 188 159 183 M152 200 Q161 206 173 204", "#703e4d", 1.75);
+    fill("M215 136 Q226 124 237 133 Q244 140 235 156 L225 169 L217 167 Z", skin, ink, 2);
+    line("M222 153 Q223 141 231 139 Q236 140 232 146", "#9b5359", 2);
+
+    const hair = "M122 147 Q115 129 118 104 Q104 80 119 65 Q132 48 155 50 Q173 35 202 43 Q234 47 250 77 Q257 93 249 107 Q244 123 235 133 Q229 126 220 137 L212 147 L207 134 L212 114 Q209 102 201 98 Q185 86 175 92 Q161 98 146 93 Q136 102 132 116 L131 137 Z";
+    fill(hair, "#443049", ink, 3.5);
+    fill("M118 94 Q111 73 133 60 Q145 52 160 55 Q178 39 200 48 Q227 51 246 78 Q231 66 216 67 Q190 58 175 71 Q152 86 132 85 Z", "#664354");
+    fill("M156 75 Q185 49 211 56 Q226 59 240 72 Q213 61 196 68 Q179 80 161 83 Q137 91 121 82 Q142 86 156 75 Z", "#85575b");
+    fill("M185 89 Q208 75 238 88 L248 93 L239 118 L222 133 L216 136 Q222 111 207 100 Z", "#34263f");
+    line("M131 70 Q147 62 162 65 Q181 48 201 52 M167 82 Q193 67 212 73 M231 86 Q241 94 237 105", "#b47a68", 2);
+    line("M212 52 Q239 61 249 84", "#f1aa7f", 2);
+
+    fill("M111 131 Q115 126 124 128 L148 132 Q152 134 151 140 L145 154 Q141 164 131 162 L120 159 Q114 157 112 149 Z", "#362947", ink, 2.5);
+    fill("M154 135 Q168 130 184 135 L204 139 Q209 140 208 145 L200 157 Q193 167 184 166 L169 163 Q159 162 157 154 Z", "#38294a", ink, 2.5);
+    line("M150 138 Q153 136 157 138 M207 141 L219 138", "#402e44", 3.5);
+    line("M118 133 L141 137 M164 139 L193 144", "#efb0a8", 2);
+    line("M119 148 L133 137 M169 156 L185 143", "#77608e", 3);
+    fill("M228 160 A4 4 0 1 1 234 164 A4 4 0 0 1 228 160", "#f5ce83", "#9a5d61", 1);
+    line("M285 270 Q316 282 325 309", "#cde5af", 3);
+  })();
+
+  (() => {
+    const panel = document.querySelector(".site-questions");
+    const answer = panel.querySelector(".site-questions-answer");
+    const responses = {
+      excel: { text: "这个工具用 pandas 和 openpyxl 批量清洗表格、汇总指标并导出日报。", url: "excel-tool.html", label: "查看工具详情" },
+      gallery: { text: "相册收录了站主分享的摄影作品，可以点开图片查看大图。", url: "#gallery", label: "打开相册" }
+    };
+    panel.querySelectorAll("[data-site-topic]").forEach(button => {
+      button.addEventListener("click", () => {
+        const response = responses[button.dataset.siteTopic];
+        const link = document.createElement("a");
+        link.href = response.url;
+        link.textContent = response.label + " →";
+        answer.replaceChildren(response.text + " ", link);
+      });
+    });
+  })();
   </script>
 </body>
 </html>
